@@ -2,7 +2,6 @@ package sieve
 
 import (
 	"fmt"
-	"log"
 )
 
 const minimumPrime int64 = 2
@@ -21,15 +20,12 @@ func NewSieve() Sieve {
 // GetNthPrime returns the nth prime number i.e. 2 as the 0th prime number.
 func (prime *Prime) GetNthPrime(n int64) (int64, error) {
 	scope := n
-	primeList := []int64{}
 
 	if n < 0 {
 		return 0, fmt.Errorf("invalid number: %d, negative numbers not allowed", n)
-	} else if n < minimumPrime {
-		scope = n + 1
-
-		log.Printf("%d is less than minimum prime: %d, using %d as scope", n, minimumPrime, scope)
 	}
+
+	primeList := prime.generateList(scope)
 
 	// Scope is used to control the range of prime numbers to generate.
 	// If the list is not long enough, triple the scope to generate more prime numbers
@@ -44,6 +40,10 @@ func (prime *Prime) GetNthPrime(n int64) (int64, error) {
 
 // generateList generates a list of prime numbers up to the limit.
 func (prime *Prime) generateList(limit int64) []int64 {
+	if limit < minimumPrime {
+		limit = minimumPrime
+	}
+
 	// Initialize slice of booleans to indicate numbers as prime.
 	isPrime := make([]bool, limit+1)
 	for i := range isPrime {
@@ -62,7 +62,7 @@ func (prime *Prime) generateList(limit int64) []int64 {
 	}
 
 	// Assign prime numbers to list.
-	primeList := []int64{}
+	primeList := make([]int64, 0, len(isPrime))
 	for i := minimumPrime; i <= limit; i++ {
 		if isPrime[i] {
 			primeList = append(primeList, i)
